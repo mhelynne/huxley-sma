@@ -72,7 +72,7 @@ public class AskRecommendation extends Behaviour {
 
 			finished = true;
 
-			myAgent.addBehaviour(new WaitForRecommendedResponse(this.studentAgent));
+			myAgent.addBehaviour(new WaitForRecommenderResponse(this.studentAgent));
 		
 		}
 		

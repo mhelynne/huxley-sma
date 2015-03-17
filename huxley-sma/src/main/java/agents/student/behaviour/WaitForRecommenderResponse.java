@@ -15,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.JsonReader;
-import agents.recommender.behaviour.RequestData;
+import agents.recommender.behaviour.NdRequestData;
 import agents.student.StudentAgent;
 
-public class WaitForRecommendedResponse extends Behaviour {
+public class WaitForRecommenderResponse extends Behaviour {
 
 	private static final long serialVersionUID = 12L;
 
@@ -33,9 +33,9 @@ public class WaitForRecommendedResponse extends Behaviour {
 	private int step = 0;
 	private boolean finished = false;
 
-	static Logger logger = LoggerFactory.getLogger(RequestData.class);
+	static Logger logger = LoggerFactory.getLogger(NdRequestData.class);
 
-	public WaitForRecommendedResponse(StudentAgent studentAgent) {
+	public WaitForRecommenderResponse(StudentAgent studentAgent) {
 		this.studentAgent = studentAgent;
 		repliesCntMax = studentAgent.getRecommenderAgents().length;
 		recommendProblemJsonList = new ArrayList<>();
@@ -90,7 +90,7 @@ public class WaitForRecommendedResponse extends Behaviour {
 
 				problem = (Problem) JsonReader.readValueAsObject(jsonArray.get(0).toString(), Problem.class);
 				text = jsonArray.get(1).toString();
-
+				
 				studentAgent.getStudentGui().createDialog(text + " " + problem.getName()); // Mostra a recomendação
 
 			} else {

@@ -19,11 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import util.JsonReader;
 
-public class RequestData extends Behaviour {
+public class NdRequestData extends Behaviour {
 
 	private static final long serialVersionUID = 22L;
 
-	static Logger logger = LoggerFactory.getLogger(RequestData.class);
+	static Logger logger = LoggerFactory.getLogger(NdRequestData.class);
 
 	private AID dataAgent;
 	private String username;
@@ -38,7 +38,7 @@ public class RequestData extends Behaviour {
 	private String refuseMsg;
 
 	// O agente de dados a ser consultado, o username para ser enviado ao agente de dados e a mensagem que precisa ser respondida
-	public RequestData(AID dataAgent, String username, ACLMessage msgFromStudent) {
+	public NdRequestData(AID dataAgent, String username, ACLMessage msgFromStudent) {
 		this.dataAgent = dataAgent;
 		this.username = username;
 		this.msgFromStudent = msgFromStudent;
@@ -222,9 +222,8 @@ public class RequestData extends Behaviour {
 		problemSubmissionList = new ArrayList<ProblemSubmission>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			jsonObject = jsonArray.getJSONObject(i);
-			problemSubmission = (ProblemSubmission) JsonReader
-					.readValueAsObject(jsonObject.toString(),
-							ProblemSubmission.class);
+			problemSubmission = (ProblemSubmission) JsonReader.readValueAsObject(jsonObject.toString(),
+							     ProblemSubmission.class);
 			if (problemSubmission != null) {
 				problemSubmissionList.add(problemSubmission);
 			}
