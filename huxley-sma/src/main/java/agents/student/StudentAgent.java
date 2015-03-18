@@ -1,8 +1,8 @@
 package agents.student;
 
+import gui.StudentGui;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import agents.student.behaviour.AskRecommendation;
-import gui.StudentGui;
 
 public class StudentAgent extends Agent {
 
@@ -45,12 +44,9 @@ public class StudentAgent extends Agent {
 	}
 
 	// Isso é chamado pela GUI quando o usuário insere seu username no Huxley
-	public void informUsername(final String huxleyUsername) {
-		addBehaviour(new OneShotBehaviour() {
-			public void action() {
-				username = huxleyUsername;
-			}
-		} );
+	public void informUsername(String huxleyUsername) {
+		
+		username = huxleyUsername;
 		
 		// Buscando lista de recomendadores
 		DFAgentDescription template = new DFAgentDescription();
@@ -86,6 +82,10 @@ public class StudentAgent extends Agent {
 	
 	public MessageTemplate getMt() {
 		return mt;
+	}
+	
+	public void setMt(MessageTemplate mt) {
+		this.mt = mt;
 	}
 
 }

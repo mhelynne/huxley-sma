@@ -36,7 +36,6 @@ public class AskRecommendation extends Behaviour {
 		this.studentAgent = studentAgent;
 		username = studentAgent.getUsername();
 		recommenderAgents = studentAgent.getRecommenderAgents();
-		mt = studentAgent.getMt();
 	}
 
 	@Override
@@ -70,6 +69,7 @@ public class AskRecommendation extends Behaviour {
 					MessageTemplate.MatchConversationId("cfp"),
 					MessageTemplate.MatchInReplyTo(msg.getReplyWith()));
 
+			studentAgent.setMt(mt);
 			finished = true;
 
 			myAgent.addBehaviour(new WaitForRecommenderResponse(this.studentAgent));

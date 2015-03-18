@@ -46,8 +46,8 @@ public class WaitForRecommenderResponse extends Behaviour {
 	public void action() {
 
 		ACLMessage reply = myAgent.receive(expectedMT); // Recebe resposta vinda
-												// do agente de dados,
-												// pode ser PROPOSE ou REFUSE
+														// do agente de dados,
+														// pode ser PROPOSE ou REFUSE
 
 		switch (step) {
 		case 0:
