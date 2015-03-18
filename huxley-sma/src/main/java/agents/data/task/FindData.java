@@ -31,6 +31,21 @@ public class FindData {
 		
 	}
 
+	// Retorna os dados do problema com id informado
+	public String findProblemById(long id) {
+		
+		ProblemDao problemDao = new ProblemDaoMySQL();
+		Problem problem;
+		String problemJson = null;
+		
+		problem = problemDao.selectProblemById(id);
+		problemJson = JsonMapper.writeValueAsString(problem);
+		
+		return problemJson;
+		
+	}
+	
+	// Retorna dados do problema, com nd informado, que foi menos resolvido (menor taxa de acerto)
 	public String findLeastSolvedProblemByNd(double nd) {
 		
 		// TODO excluir problemas que já foram respondidos pelo usuário
@@ -46,7 +61,7 @@ public class FindData {
 		Integer totalCount;
 		double rate;
 		double lower = Double.MAX_VALUE;
-		long recommendedProblemId = 0;
+		long leastSolvedProblemId = 0;
 				
 		countCorrectProblemNdMap = problemDao.countCorrectSubmissionsByProblemNd(nd);
 		countProblemNdMap = problemDao.countSubmissionsByProblemNd(nd);
@@ -61,17 +76,17 @@ public class FindData {
 				
 				if(lower > rate) {
 					lower = rate;
-					recommendedProblemId = problemId;
+					leastSolvedProblemId = problemId;
 				}
 			}
 		}
 			
-		problem = problemDao.selectProblemById(recommendedProblemId);
+		problem = problemDao.selectProblemById(leastSolvedProblemId);
 		
 		problemJson = JsonMapper.writeValueAsString(problem);
 		
 		return problemJson;
 		
 	}
-
+	
 }

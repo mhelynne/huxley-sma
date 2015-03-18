@@ -78,12 +78,12 @@ public class WaitForRecommenderResponse extends Behaviour {
 
 		case 1:
 
-			Random randon = new Random();
+			Random random = new Random();
 
 			if (!recommendProblemJsonList.isEmpty()) {
 
 				// Escolhe um dos problemas recomendados aleatoriamente
-				recommendProblemJson = recommendProblemJsonList.get(randon.nextInt(recommendProblemJsonList.size()));
+				recommendProblemJson = recommendProblemJsonList.get(random.nextInt(recommendProblemJsonList.size()));
 
 				JSONArray jsonArray = new JSONArray(recommendProblemJson);
 				String text;
@@ -91,7 +91,8 @@ public class WaitForRecommenderResponse extends Behaviour {
 				problem = (Problem) JsonReader.readValueAsObject(jsonArray.get(0).toString(), Problem.class);
 				text = jsonArray.get(1).toString();
 				
-				studentAgent.getStudentGui().createDialog(text + " " + problem.getName()); // Mostra a recomendação
+				studentAgent.getStudentGui().createDialog( 
+						studentAgent.getUsername() + ", " + text + " " + problem.getName()); // Mostra a recomendação
 
 			} else {
 				// Motivo pelo qual não se deu recomendação

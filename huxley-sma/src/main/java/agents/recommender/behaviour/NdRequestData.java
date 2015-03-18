@@ -1,47 +1,31 @@
 package agents.recommender.behaviour;
 
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import model.ProblemSubmission;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.JsonReader;
+public class NdRequestData extends RequestData {
 
-public class NdRequestData extends Behaviour {
-
-	private static final long serialVersionUID = 22L;
+	private static final long serialVersionUID = 221L;
 
 	static Logger logger = LoggerFactory.getLogger(NdRequestData.class);
-
-	private AID dataAgent;
-	private String username;
-	private ACLMessage msgFromStudent;
 	
-	private MessageTemplate mt; // The template to receive replies
 	private int step = 0;	
-	private boolean finished = false;
-	
 	private double recommendedNd;
-	private String jsonProblem;
-	private String refuseMsg;
-
+	
 	// O agente de dados a ser consultado, o username para ser enviado ao agente de dados e a mensagem que precisa ser respondida
 	public NdRequestData(AID dataAgent, String username, ACLMessage msgFromStudent) {
-		this.dataAgent = dataAgent;
-		this.username = username;
-		this.msgFromStudent = msgFromStudent;
+		super(dataAgent, username, msgFromStudent);
 	}
 
 	@Override
@@ -51,35 +35,14 @@ public class NdRequestData extends Behaviour {
 
 		case 0:
 
-			// Esse username será enviado para o agente de dados
-			JSONObject usernameJson = new JSONObject();
-			usernameJson.put("username", username);
-
-			// Criando mensagem para enviar ao Agente Dados,
-			// solicitando as informações do usuário
-
-			ACLMessage msgToData = new ACLMessage(ACLMessage.REQUEST);
-			msgToData.addReceiver(dataAgent);
-			msgToData.setOntology("request-from-recommender-by-level");
-			msgToData.setContent(usernameJson.toString());
-			msgToData.setConversationId("rqs");
-			msgToData.setReplyWith("rqs" + System.currentTimeMillis()); // Unique value
-
-			logger.info("Enviando " + msgToData.getOntology() + " : " + usernameJson);
-
-			myAgent.send(msgToData);
-
-			// Prepare the template to get answer
-			mt = MessageTemplate.and(
-					MessageTemplate.MatchConversationId("rqs"),
-					MessageTemplate.MatchInReplyTo(msgToData.getReplyWith()));
-			
+			requestProblemSubmissionList();			
 			step = 1;
 
 			break;
 
 		case 1:
 
+			List<ProblemSubmission> problemSubmissionList;
 			ACLMessage reply = myAgent.receive(mt); // Recebe resposta vinda
 													// do agente de dados,
 													// pode ser INFORM ou REFUSE
@@ -90,7 +53,8 @@ public class NdRequestData extends Behaviour {
 				if (reply.getPerformative() == ACLMessage.INFORM) {
 
 					logger.info("Recebida " + reply.getOntology()+ ", com username " + username);
-					recommendedNd = readMessage(reply.getContent());
+					problemSubmissionList = readProblemSubmissionListMessage(reply.getContent());
+					recommendedNd = analiseLevel(problemSubmissionList);
 					step = 2;
 
 				} else if (reply.getPerformative() == ACLMessage.REFUSE) {
@@ -109,29 +73,7 @@ public class NdRequestData extends Behaviour {
 
 		case 2:
 
-			// Esse username será enviado para o agente de dados
-			JSONObject ndJson = new JSONObject();
-			ndJson.put("nd", recommendedNd);
-
-			// Criando mensagem para enviar ao Agente Dados,
-			// solicitando as informações do usuário
-
-			ACLMessage msg2ToData = new ACLMessage(ACLMessage.REQUEST);
-			msg2ToData.addReceiver(dataAgent);
-			msg2ToData.setOntology("request-problem-by-nd");
-			msg2ToData.setContent(ndJson.toString());
-			msg2ToData.setConversationId("rqs");
-			msg2ToData.setReplyWith("rqs" + System.currentTimeMillis()); // Unique value
-
-			logger.info("Enviando " + msg2ToData.getOntology() + " : " + recommendedNd);
-
-			myAgent.send(msg2ToData);
-
-			// Prepare the template to get answer
-			mt = MessageTemplate.and(
-					MessageTemplate.MatchConversationId("rqs"),
-					MessageTemplate.MatchInReplyTo(msg2ToData.getReplyWith()));
-
+			requestLeastSolvedProblemByNd();
 			step = 3;
 			break;
 
@@ -168,69 +110,18 @@ public class NdRequestData extends Behaviour {
 			}
 			break;
 
-		case 4:  // Este passo responde ao agente estudante com um problema recomendado
+		case 4:  // Este passo 
 			
-			// Aqui utilizamos ACLMessage msgFromStudent	
-			ACLMessage replyToStudent = msgFromStudent.createReply();
-			replyToStudent.setReplyWith(msgFromStudent.getReplyWith());
-
-			// Preparando o resultado a ser enviado (problema + mensagem)
-			JSONArray jsonResult = new JSONArray();
-			jsonResult.put(new JSONObject(jsonProblem) );
-			jsonResult.put("Tente resolver o problema ");
-			
-			// Compondo e enviando a mensagem
-			replyToStudent.setPerformative(ACLMessage.PROPOSE);
-			replyToStudent.setOntology("problem-text");
-			replyToStudent.setContent(jsonResult.toString());
-			
-			logger.info("Enviando "+ replyToStudent.getOntology() + ": "+ jsonResult);
-			myAgent.send(replyToStudent);
-			
-			finished = true;
+			sendResponseToStudent("tente resolver o problema");
 			break;		
 		
 		case 5: // Esse passo responde ao agente estudante, caso não encontre recomendação
 			
-			// Aqui utilizamos ACLMessage msgFromStudent	
-			ACLMessage replyToStudentError = msgFromStudent.createReply();
-			replyToStudentError.setReplyWith(msgFromStudent.getReplyWith());
-			
-			// Compondo e enviando a mensagem
-			replyToStudentError.setPerformative(ACLMessage.REFUSE);
-			replyToStudentError.setOntology("refuse");
-			replyToStudentError.setContent(refuseMsg);
-			
-			logger.info("Enviando "+ replyToStudentError.getOntology());
-			myAgent.send(replyToStudentError);
-			
-			finished = true;
+			sendRefuseToStudent();
 			break;
+			
 		}
 		
-	}
-
-	private double readMessage(String content) {
-
-		List<ProblemSubmission> problemSubmissionList;
-		ProblemSubmission problemSubmission;
-		JSONArray jsonArray;
-		JSONObject jsonObject;
-
-		jsonArray = new JSONArray(content);
-
-		problemSubmissionList = new ArrayList<ProblemSubmission>();
-		for (int i = 0; i < jsonArray.length(); i++) {
-			jsonObject = jsonArray.getJSONObject(i);
-			problemSubmission = (ProblemSubmission) JsonReader.readValueAsObject(jsonObject.toString(),
-							     ProblemSubmission.class);
-			if (problemSubmission != null) {
-				problemSubmissionList.add(problemSubmission);
-			}
-		}
-
-		return analiseLevel(problemSubmissionList);
-
 	}
 
 	private double analiseLevel(List<ProblemSubmission> problemSubmissionList) {
@@ -287,10 +178,31 @@ public class NdRequestData extends Behaviour {
 		return recommendedNd;
 
 	}
+	
+	private void requestLeastSolvedProblemByNd() {
+		
+		JSONObject ndJson = new JSONObject();
+		ndJson.put("nd", recommendedNd);
 
-	@Override
-	public boolean done() {		
-		return finished;
+		// Criando mensagem para enviar ao Agente Dados,
+		// solicitando um problema por nd, nesse caso, o menos respondido
+
+		ACLMessage msg2ToData = new ACLMessage(ACLMessage.REQUEST);
+		msg2ToData.addReceiver(dataAgent);
+		msg2ToData.setOntology("request-least-solved-problem-by-nd");
+		msg2ToData.setContent(ndJson.toString());
+		msg2ToData.setConversationId("rqs");
+		msg2ToData.setReplyWith("rqs" + System.currentTimeMillis()); // Unique value
+
+		logger.info("Enviando " + msg2ToData.getOntology() + " : " + recommendedNd);
+
+		myAgent.send(msg2ToData);
+
+		// Prepare the template to get answer
+		mt = MessageTemplate.and(
+				MessageTemplate.MatchConversationId("rqs"),
+				MessageTemplate.MatchInReplyTo(msg2ToData.getReplyWith()));
+		
 	}
 
 }

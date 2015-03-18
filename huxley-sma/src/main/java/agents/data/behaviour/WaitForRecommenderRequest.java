@@ -25,14 +25,18 @@ public class WaitForRecommenderRequest extends CyclicBehaviour {
 
 		if (msg == null) {
 			block();
-		} else if (msg.getOntology().equals("request-from-recommender-by-level")) {
+		} else if (msg.getOntology().equals("request-problem-submission-list")) {
 
-			answerRequestFromRecommenderByLevel(msg);
+			answerRequestFromNdRecommender(msg);
 
-		} else if (msg.getOntology().equals("request-problem-by-nd")) {
+		} else if (msg.getOntology().equals("request-problem-by-id")) {
 			
-			answerRequestProblemsByNd(msg);
+			answerRequestProblemById(msg);
+		
+		} else if (msg.getOntology().equals("request-least-solved-problem-by-nd")) {
 			
+			answerRequestLeastSolvedProblemsByNd(msg);
+						
 		} else {
 			
 			ACLMessage unknown = msg.createReply();
@@ -44,7 +48,7 @@ public class WaitForRecommenderRequest extends CyclicBehaviour {
 
 	}
 
-	private void answerRequestFromRecommenderByLevel(ACLMessage msg) {
+	private void answerRequestFromNdRecommender(ACLMessage msg) {
 		
 		// Lendo o username que solicita recomendação
 		String jsonString = msg.getContent();
@@ -79,8 +83,42 @@ public class WaitForRecommenderRequest extends CyclicBehaviour {
 
 	}
 	
+	private void answerRequestProblemById(ACLMessage msg) {
+		// Lendo o username que solicita recomendação
+		String jsonString = msg.getContent();
+		long id;
 
-	private void answerRequestProblemsByNd(ACLMessage msg) {
+		id = new JSONObject(jsonString).getLong("id");
+
+		logger.info("Recebida " + msg.getOntology() + ", com id "	+ id);
+
+		// Bucando os dados de submissão do usuário
+		FindData findData = new FindData();
+		String problemsJson;
+		problemsJson = findData.findProblemById(id);
+
+		// Preparando resposta
+		ACLMessage reply = msg.createReply();
+
+		if (problemsJson != null) {
+			reply.setPerformative(ACLMessage.INFORM);
+			reply.setOntology("problem-data");
+			reply.setContent(problemsJson);
+
+			logger.info("Respondendo com problema de nd " + id);
+		} else {
+			reply.setPerformative(ACLMessage.REFUSE);
+			reply.setOntology("nada-encontrado");
+			reply.setContent("");
+
+			logger.info("Problemas não encontrados para o nd " + id);
+		}
+		myAgent.send(reply);
+		
+	}
+
+
+	private void answerRequestLeastSolvedProblemsByNd(ACLMessage msg) {
 		// Lendo o username que solicita recomendação
 		String jsonString = msg.getContent();
 		double nd;
