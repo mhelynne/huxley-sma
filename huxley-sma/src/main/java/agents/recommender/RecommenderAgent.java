@@ -1,5 +1,7 @@
 package agents.recommender;
 
+import model.Request;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +46,7 @@ public abstract class RecommenderAgent extends Agent {
 		
 	}
 	
-	public abstract Behaviour recommenderToDataBehaviour(AID dataAgent, String username,
+	public abstract Behaviour recommenderToDataBehaviour(AID dataAgent, Request request,
 														 ACLMessage msgFromStudent);
 	
 	protected void takeDown() {

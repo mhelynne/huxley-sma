@@ -4,16 +4,16 @@ import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import model.Request;
-import agents.recommender.behaviour.NdRequestData;
+import agents.recommender.behaviour.AleatoryRequestData;
 
-public class NdRecommenderAgent extends RecommenderAgent {
+public class AleatoryRecommenderAgent extends RecommenderAgent {
 
-	private static final long serialVersionUID = 21L;
+	private static final long serialVersionUID = 23L;
 
 	@Override
 	protected void setup() {
 
-		this.agentName = "level-recommender";
+		this.agentName = "aleatory-recommender";
 		super.setup();
 		
 	}
@@ -21,8 +21,8 @@ public class NdRecommenderAgent extends RecommenderAgent {
 	@Override
 	public Behaviour recommenderToDataBehaviour(AID dataAgent, Request request, ACLMessage msgFromStudent) {
 		
-		return new NdRequestData(dataAgent, request, msgFromStudent);
+		return new AleatoryRequestData(dataAgent, request, msgFromStudent);
 		
 	}
-	
+
 }

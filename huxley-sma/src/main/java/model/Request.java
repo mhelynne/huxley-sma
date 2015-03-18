@@ -5,7 +5,7 @@ import java.util.List;
 public class Request {
 	
 	String username;
-	List<Long> notWantedProblemId;
+	List<Long> notWantedProblemsId;
 	
 	public String getUsername() {
 		return username;
@@ -15,12 +15,12 @@ public class Request {
 		this.username = username;
 	}
 	
-	public List<Long> getNotWantedProblemId() {
-		return notWantedProblemId;
+	public List<Long> getNotWantedProblemsId() {
+		return notWantedProblemsId;
 	}
 	
-	public void setNotWantedProblemId(List<Long> notWantedProblemId) {
-		this.notWantedProblemId = notWantedProblemId;
+	public void setNotWantedProblemsId(List<Long> notWantedProblemsId) {
+		this.notWantedProblemsId = notWantedProblemsId;
 	}
 
 }

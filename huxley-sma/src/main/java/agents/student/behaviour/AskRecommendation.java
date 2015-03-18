@@ -31,7 +31,6 @@ public class AskRecommendation extends Behaviour {
 	private Request request = new Request();
 	private String jsonRequest;
 	
-
 	public AskRecommendation(StudentAgent studentAgent) {
 		this.studentAgent = studentAgent;
 		username = studentAgent.getUsername();
@@ -46,7 +45,7 @@ public class AskRecommendation extends Behaviour {
 
 			// Criando a solicitação
 			request.setUsername(username);
-			request.setNotWantedProblemId(new ArrayList<Long>());
+			request.setNotWantedProblemsId(new ArrayList<Long>());
 			jsonRequest = JsonMapper.writeValueAsString(request);
 
 			// Criando mensagem para enviar aos agentes recomendadores,

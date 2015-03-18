@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.ProblemSubmission;
+import model.Request;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,11 +20,12 @@ import util.JsonReader;
 
 public class RequestData extends Behaviour {
 
-	private static final long serialVersionUID = 22L;
+	private static final long serialVersionUID = 211L;
 
 	static Logger logger = LoggerFactory.getLogger(RequestData.class);
 
 	protected AID dataAgent;
+	protected Request request;
 	protected String username;
 	
 	protected MessageTemplate mt; // The template to receive replies
@@ -35,9 +37,10 @@ public class RequestData extends Behaviour {
 	private boolean finished = false;
 	
 	// O agente de dados a ser consultado, o username para ser enviado ao agente de dados e a mensagem que precisa ser respondida
-	public RequestData(AID dataAgent, String username, ACLMessage msgFromStudent) {
+	public RequestData(AID dataAgent, Request request, ACLMessage msgFromStudent) {
 		this.dataAgent = dataAgent;
-		this.username = username;
+		this.request = request;
+		this.username = request.getUsername();
 		this.msgFromStudent = msgFromStudent;
 	}
 	

@@ -46,7 +46,8 @@ public class FindData {
 	}
 	
 	// Retorna dados do problema, com nd informado, que foi menos resolvido (menor taxa de acerto)
-	public String findLeastSolvedProblemByNd(double nd) {
+	// excluindo os problemas não desejados
+	public String findLeastSolvedProblemByNd(double nd, List<Long> notWantedProblemsId) {
 		
 		// TODO excluir problemas que já foram respondidos pelo usuário
 		ProblemDao problemDao = new ProblemDaoMySQL();
@@ -65,7 +66,16 @@ public class FindData {
 				
 		countCorrectProblemNdMap = problemDao.countCorrectSubmissionsByProblemNd(nd);
 		countProblemNdMap = problemDao.countSubmissionsByProblemNd(nd);
-
+		
+		// Desconsiderando problemas não desejados
+		if(notWantedProblemsId!=null){
+			for (Long id : notWantedProblemsId) {
+				countCorrectProblemNdMap.remove(id);
+				countProblemNdMap.remove(id);
+			}
+		}
+		
+		// Calculando o problema menos resolvidos, entre os problemas que podem ser considerados		
 		for (Map.Entry<Long, Integer> entry : countProblemNdMap.entrySet()) {
 			problemId = entry.getKey();
 			totalCount = entry.getValue();

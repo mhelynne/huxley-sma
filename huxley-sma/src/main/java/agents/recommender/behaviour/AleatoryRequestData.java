@@ -3,11 +3,7 @@ package agents.recommender.behaviour;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import model.ProblemSubmission;
 import model.Request;
@@ -15,16 +11,16 @@ import model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PersistentRequestData extends RequestData {
+public class AleatoryRequestData extends RequestData {
+	
+	private static final long serialVersionUID = 2113L;
 
-	private static final long serialVersionUID = 2112L;
-
-	static Logger logger = LoggerFactory.getLogger(PersistentRequestData.class);
-
-	private int step = 0;	
+	static Logger logger = LoggerFactory.getLogger(AleatoryRequestData.class);
+	
+	private int step = 0;
 	
 	// O agente de dados a ser consultado, o username para ser enviado ao agente de dados e a mensagem que precisa ser respondida
-	public PersistentRequestData(AID dataAgent, Request request, ACLMessage msgFromStudent) {
+	public AleatoryRequestData(AID dataAgent, Request request, ACLMessage msgFromStudent) {
 		super(dataAgent, request, msgFromStudent);
 	}
 
@@ -35,7 +31,7 @@ public class PersistentRequestData extends RequestData {
 
 		case 0:
 
-			requestProblemSubmissionList();	
+			requestProblemSubmissionList();			
 			step = 1;
 
 			break;
@@ -54,16 +50,8 @@ public class PersistentRequestData extends RequestData {
 
 					logger.info("Recebida " + reply.getOntology()+ ", com username " + username);
 					problemSubmissionList = readProblemSubmissionListMessage(reply.getContent());
-					recommendedId = analisePersistence(problemSubmissionList);
-					if(recommendedId == 0) {
-						// Não encontrou um problema para recomendar
-						// porque todos os problemas tentados já foram resolvidos
-						
-						refuseMsg = "Nenhum problema recomendado";
-						step = 5; // Responde refuse
-					}
-					
-					step = 2; // Encontrou um id, vai para o próximo passo
+					analiseNotWantedProblems(problemSubmissionList);
+					step = 2;
 
 				} else if (reply.getPerformative() == ACLMessage.REFUSE) {
 					
@@ -81,7 +69,7 @@ public class PersistentRequestData extends RequestData {
 
 		case 2:
 
-			requestProblemById();
+			requestAleatoryProblem();
 			step = 3;
 			break;
 
@@ -96,7 +84,7 @@ public class PersistentRequestData extends RequestData {
 				// INFORM traz um problema
 				if (reply2.getPerformative() == ACLMessage.INFORM) {
 
-					logger.info("Recebida " + reply2.getOntology() + ", com id " + recommendedId);
+					logger.info("Recebida " + reply2.getOntology());
 					
 					jsonProblem = reply2.getContent();
 					logger.debug("O agente recomendador escolheu um problema " + jsonProblem);
@@ -105,7 +93,7 @@ public class PersistentRequestData extends RequestData {
 
 				} else if (reply2.getPerformative() == ACLMessage.REFUSE) {
 					
-					logger.info("Solicitação negada! Não foi encontrado problema com id " + recommendedId);
+					logger.info("Solicitação negada! Não foi encontrado problema");
 					
 					refuseMsg = "Nenhum problema recomendado";
 					
@@ -120,58 +108,41 @@ public class PersistentRequestData extends RequestData {
 
 		case 4:  // Este passo responde ao agente estudante com um problema recomendado
 			
-			sendResponseToStudent("continue tentando o problema");
+			sendResponseToStudent("tente resolver o problema");
 			break;		
 		
 		case 5: // Esse passo responde ao agente estudante, caso não encontre recomendação
 			
 			sendRefuseToStudent();
 			break;
+			
 		}
 		
 	}
 
-	private long analisePersistence(List<ProblemSubmission> problemSubmissionList) {
+	private void analiseNotWantedProblems(List<ProblemSubmission> problemSubmissionList) {
 		
-		long problemId =0;
-		List<Long> correctProblems;
-		List<Long> unsolvedProblems;
-		Map<Long, Integer> unsolvedProblemTriesMap = new HashMap<>();
-		Integer tries;
+		List<Long> notWantedProblemsId = request.getNotWantedProblemsId();
 		
-		correctProblems = new ArrayList<>();
-		
-		for (ProblemSubmission ps : problemSubmissionList) {
+		for (ProblemSubmission sub : problemSubmissionList) {
 			
-			problemId = ps.getProblemId();
-			if(ps.isSolved()){
-				
-				correctProblems.add(problemId);// Se já foi resolvido retira do map
-				unsolvedProblemTriesMap.remove(problemId);
-				
-			} else { // Se não, incrementa o numero de tentativas
-				
-				tries = unsolvedProblemTriesMap.get(problemId);
-				if(tries == null) {
-					tries=0; // Não foi para o map ainda
+			if (sub.isSolved()) {
+				// Colocando os problemas já resolvidos na lista de problemas que não serão recomendados 
+				// Específico desse recomendador.
+				if( !notWantedProblemsId.contains(sub.getProblemId()) ) { 
+					notWantedProblemsId.add(sub.getProblemId());
 				}
-				tries++;
-				unsolvedProblemTriesMap.put(problemId, tries);
-				
 			}
 			
 		}
-
-		problemId =0;
-		if(! unsolvedProblemTriesMap.isEmpty()) {
-			
-			// Sorteia um problema entre os problemas ainda não resolvidos para incentivar a persistencia			
-			Random random = new Random();
-			unsolvedProblems = new ArrayList<>(unsolvedProblemTriesMap.keySet());
-			problemId = unsolvedProblems.get(random.nextInt( unsolvedProblems.size() ));
-
-		}
-		return problemId;
+		
+		// Atualizando a lista de problemas que não deseja ( problemas já resolvidos )
+		request.setNotWantedProblemsId(notWantedProblemsId);
+		
+	}
+	
+	private void requestAleatoryProblem() {
+		// TODO Auto-generated method stub
 		
 	}
 

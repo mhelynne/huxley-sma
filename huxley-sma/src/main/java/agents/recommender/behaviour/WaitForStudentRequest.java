@@ -22,7 +22,7 @@ public class WaitForStudentRequest extends CyclicBehaviour {
 
 	static Logger logger = LoggerFactory.getLogger(WaitForStudentRequest.class);
 
-	String username;
+	Request request;
 	ACLMessage msgFromStudent;
 	AID dataAgent = null;
 	
@@ -38,12 +38,13 @@ public class WaitForStudentRequest extends CyclicBehaviour {
 		// Recebendo um request
 		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
 		msgFromStudent = myAgent.receive(mt);
-		
+			
 		if (msgFromStudent != null) {
 
 			// Lendo o username que solicita recomendação
 			Request request;
 			String jsonString = msgFromStudent.getContent();
+			String username;
 
 			request = (Request) JsonReader.readValueAsObject(jsonString, Request.class);
 
@@ -69,7 +70,7 @@ public class WaitForStudentRequest extends CyclicBehaviour {
 
 				// Comportamento que faz comunicação com o agente de dados
 				// É diferente para cada agente recomendador
-				myAgent.addBehaviour( recommenderAgent.recommenderToDataBehaviour(dataAgent, username, msgFromStudent) );
+				myAgent.addBehaviour( recommenderAgent.recommenderToDataBehaviour(dataAgent, request, msgFromStudent) );
 
 			} else {
 				logger.info("Solicitação não enviada! Agente de dados não encontrado");

@@ -1,9 +1,13 @@
 package agents.data.behaviour;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,18 +123,31 @@ public class WaitForRecommenderRequest extends CyclicBehaviour {
 
 
 	private void answerRequestLeastSolvedProblemsByNd(ACLMessage msg) {
-		// Lendo o username que solicita recomendação
+		
+		// Lendo o username que solicita recomendação...
+		// e os problemas que serão desconsiderados
+		
+		JSONObject jsonObject;
+		JSONArray jsonArray;
 		String jsonString = msg.getContent();
+		
 		double nd;
-
-		nd = new JSONObject(jsonString).getDouble("nd");
-
+		List<Long> notWantedProblemsId = new ArrayList<>();
+		
+		jsonObject = new JSONObject(jsonString);		
+		nd = jsonObject.getDouble("nd");
+		jsonArray = new JSONArray( jsonObject.get("notWantedProblemsId").toString() );
+		
+		for (int i = 0; i < jsonArray.length(); i++) {
+			notWantedProblemsId.add(jsonArray.getLong(i));
+		}
+		
 		logger.info("Recebida " + msg.getOntology() + ", com nd "	+ nd);
 
 		// Bucando os dados de submissão do usuário
 		FindData findData = new FindData();
 		String problemsJson;
-		problemsJson = findData.findLeastSolvedProblemByNd(nd);
+		problemsJson = findData.findLeastSolvedProblemByNd(nd, notWantedProblemsId);
 
 		// Preparando resposta
 		ACLMessage reply = msg.createReply();
