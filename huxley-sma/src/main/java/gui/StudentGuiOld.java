@@ -30,16 +30,17 @@ import javax.swing.*;
 
 import agents.student.StudentAgent;
 
-public class StudentGui extends JFrame {
+public class StudentGuiOld extends JFrame {
 	
 	private static final long serialVersionUID = 111L;
 
 	private StudentAgent myAgent;
 	
 	private JTextField usernameField;
+	private JButton requestButton;
 	private JPanel p;
 	
-	public StudentGui(StudentAgent a) {
+	public StudentGuiOld(StudentAgent a) {
 		super(a.getLocalName());
 		
 		myAgent = a;
@@ -51,21 +52,20 @@ public class StudentGui extends JFrame {
 		p.add(usernameField);
 		getContentPane().add(p, BorderLayout.CENTER);
 		
-		JButton addButton = new JButton("Solicitar recomendação");
-		addButton.addActionListener( new ActionListener() {
+		requestButton = new JButton("Solicitar recomendação");
+		requestButton.addActionListener( new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				try {
 					String username = usernameField.getText().trim();
-					myAgent.informUsername(username);
-					setVisible(false);					
+					myAgent.informUsername(username);										
 				}
 				catch (Exception e) {
-					JOptionPane.showMessageDialog(StudentGui.this, "Invalid values. "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); 
+					JOptionPane.showMessageDialog(StudentGuiOld.this, "Invalid values. "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); 
 				}
 			}
 		} );
 		p = new JPanel();
-		p.add(addButton);
+		p.add(requestButton);
 		getContentPane().add(p, BorderLayout.SOUTH);
 		
 		// Make the agent terminate when the user closes 
@@ -88,8 +88,13 @@ public class StudentGui extends JFrame {
 		super.setVisible(true);
 	}
 
+	public void disableRequestButton() {
+		requestButton.setEnabled(false);
+	}
+	
 	public void createDialog(String msg) {
 		JOptionPane.showMessageDialog(p, msg);
-		super.setVisible(true);
-	}	
+		requestButton.setEnabled(true);
+	}
+	
 }

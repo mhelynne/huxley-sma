@@ -15,8 +15,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.JsonMapper;
-
 
 public class NdRequestData extends RequestData {
 
@@ -26,6 +24,7 @@ public class NdRequestData extends RequestData {
 	
 	private int step = 0;
 	private double recommendedNd;
+	
 	
 	// O agente de dados a ser consultado, o username para ser enviado ao agente de dados e a mensagem que precisa ser respondida
 	public NdRequestData(AID dataAgent, Request request, ACLMessage msgFromStudent) {
@@ -132,7 +131,7 @@ public class NdRequestData extends RequestData {
 
 		Map<Double, Integer> mapNdCorrectSubmission = new HashMap<>();
 		Map<Double, Integer> mapNdTotalSubmission = new HashMap<>();
-		List<Long> notWantedProblemsId;
+		
 		Integer contCorrect;
 		Integer contTotal;
 		Double ndKey;
@@ -168,8 +167,8 @@ public class NdRequestData extends RequestData {
 				mapNdCorrectSubmission.put(ndKey, contCorrect);
 				
 				// Colocando os problemas já resolvidos na lista de problemas que não serão recomendados 
-				// Específico desse recomendador.
-				if( !notWantedProblemsId.contains(sub.getProblemId()) ) { 
+				// Específico desse recomendador
+				if( ! notWantedProblemsId.contains(sub.getProblemId()) ) { 
 					notWantedProblemsId.add(sub.getProblemId());
 				}
 			}
@@ -187,9 +186,6 @@ public class NdRequestData extends RequestData {
 			totalWeight += weight;
 		}
 		
-		// Atualizando a lista de problemas que não deseja ( problemas já resolvidos )
-		request.setNotWantedProblemsId(notWantedProblemsId);
-	
 		// Calculando nd recomendado
 		recommendedNd = Math.ceil(acc / totalWeight); //+1?
 		return recommendedNd;
@@ -203,7 +199,7 @@ public class NdRequestData extends RequestData {
 		ndJson.put("nd", recommendedNd);
 
 		// E os problemas que devem ser desconsiderados
-		ndJson.put( "notWantedProblemsId", JsonMapper.writeValueAsString(request.getNotWantedProblemsId()) );
+		ndJson.put( "notWantedProblemsId", notWantedProblemsId );
 		
 		// Criando mensagem para enviar ao Agente Dados,
 		// solicitando um problema por nd, nesse caso, o menos respondido

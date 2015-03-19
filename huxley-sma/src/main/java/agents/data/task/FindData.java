@@ -1,7 +1,9 @@
 package agents.data.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import util.JsonMapper;
 import model.Problem;
@@ -35,11 +37,13 @@ public class FindData {
 	public String findProblemById(long id) {
 		
 		ProblemDao problemDao = new ProblemDaoMySQL();
-		Problem problem;
+		Problem problem = null;
 		String problemJson = null;
 		
 		problem = problemDao.selectProblemById(id);
-		problemJson = JsonMapper.writeValueAsString(problem);
+		if(problem != null) {
+			problemJson = JsonMapper.writeValueAsString(problem);
+		}
 		
 		return problemJson;
 		
@@ -51,7 +55,7 @@ public class FindData {
 		
 		// TODO excluir problemas que já foram respondidos pelo usuário
 		ProblemDao problemDao = new ProblemDaoMySQL();
-		Problem problem;
+		Problem problem = null;
 		String problemJson = null;
 		
 		Map<Long, Integer> countCorrectProblemNdMap;
@@ -67,33 +71,70 @@ public class FindData {
 		countCorrectProblemNdMap = problemDao.countCorrectSubmissionsByProblemNd(nd);
 		countProblemNdMap = problemDao.countSubmissionsByProblemNd(nd);
 		
-		// Desconsiderando problemas não desejados
-		if(notWantedProblemsId!=null){
-			for (Long id : notWantedProblemsId) {
-				countCorrectProblemNdMap.remove(id);
-				countProblemNdMap.remove(id);
-			}
-		}
-		
-		// Calculando o problema menos resolvidos, entre os problemas que podem ser considerados		
-		for (Map.Entry<Long, Integer> entry : countProblemNdMap.entrySet()) {
-			problemId = entry.getKey();
-			totalCount = entry.getValue();
-			correctCount = countCorrectProblemNdMap.get(problemId);
+		if(countCorrectProblemNdMap != null && countProblemNdMap != null) {
 			
-			if(correctCount!=null){
-				rate = (double)correctCount/totalCount;
-				
-				if(lower > rate) {
-					lower = rate;
-					leastSolvedProblemId = problemId;
+			// Desconsiderando problemas não desejados
+			if(notWantedProblemsId!=null){
+				for (Long id : notWantedProblemsId) {
+					countCorrectProblemNdMap.remove(id);
+					countProblemNdMap.remove(id);
 				}
 			}
-		}
 			
-		problem = problemDao.selectProblemById(leastSolvedProblemId);
+			// Calculando o problema menos resolvidos, entre os problemas que podem ser considerados		
+			for (Map.Entry<Long, Integer> entry : countProblemNdMap.entrySet()) {
+				problemId = entry.getKey();
+				totalCount = entry.getValue();
+				correctCount = countCorrectProblemNdMap.get(problemId);
+				
+				if(correctCount!=null){
+					rate = (double)correctCount/totalCount;
+					
+					if(lower > rate) {
+						lower = rate;
+						leastSolvedProblemId = problemId;
+					}
+				}
+			}
+				
+			problem = problemDao.selectProblemById(leastSolvedProblemId);
+			if(problem != null) {
+				problemJson = JsonMapper.writeValueAsString(problem);
+			}
+			
+		}
+				
+		return problemJson;
 		
-		problemJson = JsonMapper.writeValueAsString(problem);
+	}
+	
+	// Retorna os dados do problema com id informado
+	public String findAleatoryProblem(List<Long> notWantedProblemsId) {
+		
+		ProblemDao problemDao = new ProblemDaoMySQL();
+		List<Problem> problemList; // Lista com todos os problemas
+		List<Problem> filteredProblemList; // Lista com todos os problemas, exceto os não desejados
+		Problem problem = null;
+		String problemJson = null;
+		
+		problemList = problemDao.selectAllProblems();
+		
+		filteredProblemList = new ArrayList<>();
+		for (Problem p : problemList) {
+			
+			 // Considerando apenas os problemas desejados
+			if( ! notWantedProblemsId.contains(p.getId()) ){
+				filteredProblemList.add(p);				
+			}
+			
+		}
+		
+		// Sorteando um problema
+		if( ! filteredProblemList.isEmpty()){
+			Random random = new Random();
+			problem = filteredProblemList.get( random.nextInt( filteredProblemList.size() ) );
+			problemJson = JsonMapper.writeValueAsString(problem);
+		}
 		
 		return problemJson;
 		

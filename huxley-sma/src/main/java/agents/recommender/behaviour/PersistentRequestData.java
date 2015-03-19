@@ -134,19 +134,21 @@ public class PersistentRequestData extends RequestData {
 	private long analisePersistence(List<ProblemSubmission> problemSubmissionList) {
 		
 		long problemId =0;
+		List<Long> notWantedProblems;
 		List<Long> correctProblems;
 		List<Long> unsolvedProblems;
 		Map<Long, Integer> unsolvedProblemTriesMap = new HashMap<>();
 		Integer tries;
 		
+		notWantedProblems = request.getNotWantedProblemsId();
 		correctProblems = new ArrayList<>();
 		
 		for (ProblemSubmission ps : problemSubmissionList) {
 			
 			problemId = ps.getProblemId();
-			if(ps.isSolved()){
+			if( notWantedProblems.contains(problemId) || ps.isSolved()){
 				
-				correctProblems.add(problemId);// Se já foi resolvido retira do map
+				correctProblems.add(problemId);// Se já foi resolvido retira do map, ou se deve ser desconsiderado
 				unsolvedProblemTriesMap.remove(problemId);
 				
 			} else { // Se não, incrementa o numero de tentativas

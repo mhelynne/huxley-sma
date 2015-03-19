@@ -4,9 +4,6 @@ import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-
-import java.util.ArrayList;
-
 import model.Request;
 
 import org.slf4j.Logger;
@@ -28,13 +25,16 @@ public class AskRecommendation extends Behaviour {
 
 	private boolean finished = false;
 
-	private Request request = new Request();
+	private Request request;
 	private String jsonRequest;
 	
 	public AskRecommendation(StudentAgent studentAgent) {
+		
 		this.studentAgent = studentAgent;
 		username = studentAgent.getUsername();
+		request = studentAgent.getRequest();
 		recommenderAgents = studentAgent.getRecommenderAgents();
+		
 	}
 
 	@Override
@@ -44,8 +44,6 @@ public class AskRecommendation extends Behaviour {
 			logger.info("Seja bem vindo " + username);
 
 			// Criando a solicitação
-			request.setUsername(username);
-			request.setNotWantedProblemsId(new ArrayList<Long>());
 			jsonRequest = JsonMapper.writeValueAsString(request);
 
 			// Criando mensagem para enviar aos agentes recomendadores,

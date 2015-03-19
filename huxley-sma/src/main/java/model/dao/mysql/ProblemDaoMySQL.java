@@ -6,7 +6,9 @@ public class ProblemDaoMySQL extends ProblemDao {
 	
 	public ProblemDaoMySQL() {
 		
-		GET_PROBLEM_BY_ID = "select nd, name from problem where id = ?";
+		GET_PROBLEM_LIST = "select id, nd, name, description from problem";
+		
+		GET_PROBLEM_BY_ID = "select nd, name, description from problem where id = ?";
 		
 		//GET_PROBLEMS_BY_ND = "select id, name from problem where nd = ?";
 		

@@ -2,12 +2,14 @@ package agents.recommender.behaviour;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 import java.util.List;
 
 import model.ProblemSubmission;
 import model.Request;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +110,7 @@ public class AleatoryRequestData extends RequestData {
 
 		case 4:  // Este passo responde ao agente estudante com um problema recomendado
 			
-			sendResponseToStudent("tente resolver o problema");
+			sendResponseToStudent("sugerimos aleatoriamente o problema");
 			break;		
 		
 		case 5: // Esse passo responde ao agente estudante, caso não encontre recomendação
@@ -122,7 +124,7 @@ public class AleatoryRequestData extends RequestData {
 
 	private void analiseNotWantedProblems(List<ProblemSubmission> problemSubmissionList) {
 		
-		List<Long> notWantedProblemsId = request.getNotWantedProblemsId();
+		notWantedProblemsId = request.getNotWantedProblemsId();
 		
 		for (ProblemSubmission sub : problemSubmissionList) {
 			
@@ -142,8 +144,28 @@ public class AleatoryRequestData extends RequestData {
 	}
 	
 	private void requestAleatoryProblem() {
-		// TODO Auto-generated method stub
+
+		// Solicita ao agente de dados um problema escolhido aleatoriamente,
+		// porém excluindo os não desejados.
+		JSONObject notJson = new JSONObject();
+		notJson.put( "notWantedProblemsId", notWantedProblemsId );
 		
+		// Criando mensagem para enviar ao Agente Dados
+		ACLMessage msg2ToData = new ACLMessage(ACLMessage.REQUEST);
+		msg2ToData.addReceiver(dataAgent);
+		msg2ToData.setOntology("request-aleatory-problem");
+		msg2ToData.setContent(notJson.toString());
+		msg2ToData.setConversationId("rqs");
+		msg2ToData.setReplyWith("rqs" + System.currentTimeMillis()); // Unique value
+
+		logger.info("Enviando " + msg2ToData.getOntology());
+
+		myAgent.send(msg2ToData);
+
+		// Prepare the template to get answer
+		mt = MessageTemplate.and(
+				MessageTemplate.MatchConversationId("rqs"),
+				MessageTemplate.MatchInReplyTo(msg2ToData.getReplyWith()));
 	}
 
 

@@ -6,7 +6,6 @@ import jade.lang.acl.MessageTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import model.Problem;
 
@@ -24,9 +23,7 @@ public class WaitForRecommenderResponse extends Behaviour {
 
 	private StudentAgent studentAgent;
 	private MessageTemplate expectedMT;
-	private String recommendProblemJson;
-	private List<String> recommendProblemJsonList;
-	private Problem problem;
+	private List<String> recommendedProblemJsonList;
 	private String refusedMsg;
 	private int repliesCnt;
 	private int repliesCntMax;
@@ -36,10 +33,12 @@ public class WaitForRecommenderResponse extends Behaviour {
 	static Logger logger = LoggerFactory.getLogger(NdRequestData.class);
 
 	public WaitForRecommenderResponse(StudentAgent studentAgent) {
+		
 		this.studentAgent = studentAgent;
 		repliesCntMax = studentAgent.getRecommenderAgents().length;
-		recommendProblemJsonList = new ArrayList<>();
+		recommendedProblemJsonList = new ArrayList<>();
 		expectedMT = studentAgent.getMt();
+		
 	}
 
 	@Override
@@ -57,10 +56,10 @@ public class WaitForRecommenderResponse extends Behaviour {
 				if (reply.getPerformative() == ACLMessage.PROPOSE) {
 
 					logger.info("Recebida " + reply.getOntology());
-					recommendProblemJsonList.add(reply.getContent());
+					recommendedProblemJsonList.add(reply.getContent());
 
 				} else if (reply.getPerformative() == ACLMessage.REFUSE) { 
-
+					
 					logger.info("Recebida " + reply.getOntology());
 					refusedMsg = reply.getContent();
 
@@ -77,26 +76,36 @@ public class WaitForRecommenderResponse extends Behaviour {
 			break;
 
 		case 1:
-
-			Random random = new Random();
-
-			if (!recommendProblemJsonList.isEmpty()) {
-
-				// Escolhe um dos problemas recomendados aleatoriamente
-				recommendProblemJson = recommendProblemJsonList.get(random.nextInt(recommendProblemJsonList.size()));
-
-				JSONArray jsonArray = new JSONArray(recommendProblemJson);
-				String text;
-
-				problem = (Problem) JsonReader.readValueAsObject(jsonArray.get(0).toString(), Problem.class);
-				text = jsonArray.get(1).toString();
+			
+			List<Problem> recommendedProblems;
+			List<String> recommendedTexts;
+			JSONArray jsonArray;
+			Problem recommendedProblem;
+			String text;
+			
+			// Lendo os problemas recomendados que os agentes de recomendação enviaram
+			recommendedProblems = new ArrayList<>();
+			recommendedTexts = new ArrayList<>();
+			if (!recommendedProblemJsonList.isEmpty()) {
 				
-				studentAgent.getStudentGui().createDialog( 
-						studentAgent.getUsername() + ", " + text + " " + problem.getName()); // Mostra a recomendação
+				for (String rpJson : recommendedProblemJsonList) {
+					jsonArray = new JSONArray(rpJson);
+					recommendedProblem = (Problem) JsonReader.readValueAsObject(jsonArray.get(0).toString(), Problem.class);
+					text = jsonArray.get(1).toString();
+					
+					recommendedProblems.add(recommendedProblem);
+					recommendedTexts.add(text);
+				}
+								
+				// Guardamos a lista dos problemas que foram recomendados pelos agentes de recomendação
+				// Em caso de mais uma recomendação ser feita, primeiro consultamos essa lista
+				studentAgent.setRecommendedProblems(recommendedProblems);
+				studentAgent.setRecommendedTexts(recommendedTexts);
+				studentAgent.chooseProblem();
 
 			} else {
 				// Motivo pelo qual não se deu recomendação
-				studentAgent.getStudentGui().createDialog(refusedMsg); 
+				studentAgent.showRefusedMsg(refusedMsg); 
 			}
 
 			finished = true;

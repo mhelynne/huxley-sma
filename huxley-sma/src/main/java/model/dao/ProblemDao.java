@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import model.Problem;
@@ -20,6 +22,7 @@ public class ProblemDao {
 
 	static Logger logger = LoggerFactory.getLogger(ProblemDao.class);
 	
+	protected String GET_PROBLEM_LIST;
 	protected String GET_PROBLEM_BY_ID;
 	protected String GET_COUNT_CORRECT_BY_ND;
 	protected String GET_COUNT_BY_ND;
@@ -57,6 +60,9 @@ public class ProblemDao {
 			ResourcesUtil.release(rs, statement, connection);
 		}
 		
+		if(countCorrectProblemNdMap.isEmpty()){
+			countCorrectProblemNdMap = null;
+		}
 		return countCorrectProblemNdMap;
 		
 	}
@@ -93,10 +99,56 @@ public class ProblemDao {
 			ResourcesUtil.release(rs, statement, connection);
 		}
 		
+		if(countProblemNdMap.isEmpty()){
+			countProblemNdMap = null;
+		}
 		return countProblemNdMap;
 		
 	}
 
+	public List<Problem> selectAllProblems(){
+		
+		List<Problem> problemList = null;
+		Problem problem = null;
+		
+		ResultSet rs = null;
+		PreparedStatement statement = null;
+		Connection connection = null;
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Selecionando todos os problemas ...");
+		}
+
+		try {
+			if (logger.isDebugEnabled()) {
+				logger.debug(GET_PROBLEM_LIST);
+			}
+			connection = Connector.getConnection();
+			statement = connection.prepareStatement(GET_PROBLEM_LIST);
+			rs = statement.executeQuery();
+
+			problemList = new ArrayList<>();			
+			while (rs.next()) {
+				
+				problem = new Problem();
+				problem.setId(rs.getLong("id"));
+				problem.setNd(rs.getDouble("nd"));
+				problem.setName(rs.getString("name"));
+				//problem.setDescription(rs.getString("description"));
+				problemList.add(problem);
+				
+			}
+
+		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			ResourcesUtil.release(rs, statement, connection);
+		}
+		
+		return problemList;
+		
+	}
+	
 	public Problem selectProblemById(long id) {
 
 		ResultSet rs = null;
@@ -123,6 +175,7 @@ public class ProblemDao {
 				problem.setId(id);
 				problem.setNd(rs.getDouble("nd"));
 				problem.setName(rs.getString("name"));
+				//problem.setDescription(rs.getString("description"));
 				
 			}
 
@@ -179,4 +232,5 @@ public class ProblemDao {
 //		return problemList;
 //		
 //	}
+	
 }

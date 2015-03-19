@@ -1,11 +1,12 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Request {
 	
 	String username;
-	List<Long> notWantedProblemsId;
+	List<Long> notWantedProblemsId = new ArrayList<>();
 	
 	public String getUsername() {
 		return username;

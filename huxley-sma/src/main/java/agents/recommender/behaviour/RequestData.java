@@ -27,6 +27,7 @@ public class RequestData extends Behaviour {
 	protected AID dataAgent;
 	protected Request request;
 	protected String username;
+	protected List<Long> notWantedProblemsId;
 	
 	protected MessageTemplate mt; // The template to receive replies
 	protected long recommendedId;
@@ -111,6 +112,7 @@ public class RequestData extends Behaviour {
 
 		// Preparando o resultado a ser enviado (problema + mensagem)
 		JSONArray jsonResult = new JSONArray();
+		
 		jsonResult.put(new JSONObject(jsonProblem) );
 		jsonResult.put(msg); // Uma mensagem que acompanhará o nome do problema na caixa de diálogo,
 							 // por exemplo, "Tente resolver o problema"
