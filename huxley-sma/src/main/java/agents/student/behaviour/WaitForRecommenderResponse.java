@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.JsonReader;
-import agents.recommender.behaviour.NdRequestData;
 import agents.student.StudentAgent;
 
 public class WaitForRecommenderResponse extends Behaviour {
@@ -30,7 +29,7 @@ public class WaitForRecommenderResponse extends Behaviour {
 	private int step = 0;
 	private boolean finished = false;
 
-	static Logger logger = LoggerFactory.getLogger(NdRequestData.class);
+	static Logger logger = LoggerFactory.getLogger(WaitForRecommenderResponse.class);
 
 	public WaitForRecommenderResponse(StudentAgent studentAgent) {
 		
