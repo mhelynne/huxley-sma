@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.UIManager;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -39,12 +38,12 @@ public class StudentGUI extends JFrame {
 		super("Student");
 		myAgent = a;
 		
-		String laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-		try {
-			UIManager.setLookAndFeel(laf);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+//		String laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+//		try {
+//			UIManager.setLookAndFeel(laf);
+//		} catch (Exception e) {
+//			logger.error(e.getMessage(), e);
+//		}
 		
 		logoPane = new LogoPane();
 		requestRecommendationPane = new RequestRecommendationPane(this);
