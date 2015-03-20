@@ -35,5 +35,6 @@ public class LogoPane extends JPanel {
 	private void initComponents() {
 		add(imageLabel);
 		add(titleLabel);
+		
 	}
 }

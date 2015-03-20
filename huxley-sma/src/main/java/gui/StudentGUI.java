@@ -4,11 +4,14 @@ import gui.actions.CancelAction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
@@ -26,8 +29,7 @@ public class StudentGUI extends JFrame {
 	private LogoPane logoPane;
 	private DescriptionPane descriptionPane;
 	private RequestRecommendationPane requestRecommendationPane;
-	private JButton closeButton;
-	
+	private JButton closeButton;	
 
 	private StudentAgent myAgent;
 	
@@ -81,6 +83,17 @@ public class StudentGUI extends JFrame {
 			}
 		});
 		
+		
+		logoPane.addMouseListener( new MouseListener() {
+			public void mouseClicked(MouseEvent arg0) {
+				JOptionPane.showMessageDialog(logoPane, about(), "Sobre", JOptionPane.INFORMATION_MESSAGE);
+			}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {}
+		});
+		
 		main.add(logoPane, "grow, wrap");
 		main.add(new JSeparator(), "spanx, gapleft rel, growx,wrap");
 		main.add(requestRecommendationPane, "grow, wrap");
@@ -107,6 +120,15 @@ public class StudentGUI extends JFrame {
 		descriptionPane.repaint();
 		descriptionPane.setVisible(true);
 		
+	}
+	
+	private String about() {
+		return "Instituto de Computação - IC-UFAL\n"
+				+ "Mestrado em Informática\n\n"
+				
+				+ "Desenvolvido por Maria Helynne\n"
+				+ "Disciplina: Sistemas Multiagentes\n"
+				+ "Professor: Evandro Costa";
 	}
 	
 	
