@@ -134,7 +134,7 @@ public class ProblemDao {
 				problem.setId(rs.getLong("id"));
 				problem.setNd(rs.getDouble("nd"));
 				problem.setName(rs.getString("name"));
-				//problem.setDescription(rs.getString("description"));
+				problem.setDescription(rs.getString("description"));
 				problemList.add(problem);
 				
 			}
@@ -175,7 +175,7 @@ public class ProblemDao {
 				problem.setId(id);
 				problem.setNd(rs.getDouble("nd"));
 				problem.setName(rs.getString("name"));
-				//problem.setDescription(rs.getString("description"));
+				problem.setDescription(rs.getString("description"));
 				
 			}
 

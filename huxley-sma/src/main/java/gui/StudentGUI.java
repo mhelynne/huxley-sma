@@ -50,12 +50,12 @@ public class StudentGUI extends JFrame {
 		logoPane = new LogoPane();
 		requestRecommendationPane = new RequestRecommendationPane(this);
 		// TODO adicionar instancia do problema para pegar titulo e descrição
-		descriptionPane = new DescriptionPane("");
+		descriptionPane = new DescriptionPane("","");
 		descriptionPane.setVisible(false);
 		
 		initComponents();
 
-		setSize(500, 450);
+		setSize(700, 700);
 		this.setLocationRelativeTo(null);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -112,10 +112,10 @@ public class StudentGUI extends JFrame {
 		return requestRecommendationPane.getRequestRecommendationButton();		
 	}
 	
-	public void showProblem(String problemTitle) {
+	public void showProblem(String problemTitle, String problemDescription) {
 		
 		descriptionPane.setTitle(problemTitle);
-		//descriptionPane.setDescription(problemDescription);
+		descriptionPane.setDescription(problemDescription);
 		descriptionPane.revalidate();
 		descriptionPane.repaint();
 		descriptionPane.setVisible(true);

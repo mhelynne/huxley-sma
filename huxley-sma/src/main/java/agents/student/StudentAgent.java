@@ -138,7 +138,7 @@ public class StudentAgent extends Agent {
 			
 			// Mostrando a recomendação
 			title = username + ", " + text + " " + problem.getName();
-			myGui.showProblem(title);
+			myGui.showProblem(title, problem.getDescription());
 			myGui.getRequestButton().setEnabled(true);
 			
 		}
@@ -146,7 +146,7 @@ public class StudentAgent extends Agent {
 	}
 	
 	public void showRefusedMsg(String refusedMsg) {
-		myGui.showProblem(refusedMsg); 		
+		myGui.showProblem(refusedMsg,""); 		
 	}
 	
 	public String getUsername() {
@@ -181,6 +181,5 @@ public class StudentAgent extends Agent {
 		this.recommendedTexts = recommendedTexts;
 	}
 
-	
 	
 }

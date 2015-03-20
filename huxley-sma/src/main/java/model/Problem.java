@@ -5,7 +5,7 @@ public class Problem {
 	private long id;
 	private double nd;
 	private String name;
-	//private String description;
+	private String description;
 
 	public long getId() {
 		return id;
@@ -31,12 +31,12 @@ public class Problem {
 		this.name = name;
 	}
 	
-//	public String getDescription() {
-//		return description +"\nAcesse thehuxley.com e envie sua submissão";
-//	}
-//	
-//	public void setDescription(String description) {
-//		this.description = description;
-//	}
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 }
