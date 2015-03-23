@@ -2,6 +2,7 @@ package gui;
 
 import gui.actions.CancelAction;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -10,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -56,6 +58,7 @@ public class StudentGUI extends JFrame {
 		initComponents();
 
 		setSize(700, 700);
+		setMinimumSize(new Dimension(500,500));
 		this.setLocationRelativeTo(null);
 		setVisible(true);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -116,12 +119,21 @@ public class StudentGUI extends JFrame {
 		
 		descriptionPane.setTitle(problemTitle);
 		descriptionPane.setDescription(problemDescription);
-		descriptionPane.revalidate();
-		descriptionPane.repaint();
+		
+		redraw(descriptionPane);
+		redraw(descriptionPane.getScrollPane());
+		
 		descriptionPane.setVisible(true);
 		
 	}
 	
+	private void redraw(JComponent component) {
+
+		component.revalidate();
+		component.repaint();
+		
+	}
+
 	private String about() {
 		return "Instituto de Computação - IC-UFAL\n"
 				+ "Mestrado em Informática\n\n"

@@ -1,6 +1,6 @@
 package gui;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,27 +14,28 @@ public class DescriptionPane extends JPanel {
 
 	private JLabel title;
 	private JLabel description;
+	DescriptionScrollPane scrollPane;
 
 	public DescriptionPane(String problemTitle, String problemDescription) {
 		title = new JLabel();
 		description = new JLabel();
-
+		
+		scrollPane = new DescriptionScrollPane();
+		scrollPane.setLayout(new BorderLayout());
+	
 		setLayout(new MigLayout("", "grow", "[][grow]"));
 		initComponents();
 	}
 
 	private void initComponents() {
 		add(title, "gap 20 20 20 20, center, wrap");
-		add(createdDescriptionPane(), "grow");
-	}
-
-	private Component createdDescriptionPane() {
-		JPanel descriptionPane = new JPanel(new MigLayout("", "[grow]",	"[grow]"));
-		descriptionPane.add(description, "gaptop 20, align center top");
-
-		JScrollPane scroll = new JScrollPane(descriptionPane);
-
-		return scroll;
+		scrollPane.add(description);
+		
+		JScrollPane scroll = new JScrollPane();
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setViewportView(scrollPane);
+		
+		add(scroll, "grow");
 	}
 
 	public void setTitle(String problemTitle) {
@@ -48,10 +49,13 @@ public class DescriptionPane extends JPanel {
 		if (problemDescription.startsWith("<")) {
 			this.description.setText("<html>" + problemDescription + "</html>");
 		} else {
-			this.description
-					.setText("<html>Descrição do problema não encontrada</html>");
+			this.description.setText("<html>Descrição do problema não encontrada</html>");
 		}
 
+	}
+	
+	public DescriptionScrollPane getScrollPane() {
+		return scrollPane;
 	}
 
 }
